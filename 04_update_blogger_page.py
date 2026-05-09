@@ -72,41 +72,18 @@ def main():
         return
 
     with open(HTML_FILE, "r", encoding="utf-8") as f:
-        new_block = f.read()
+        new_content = f.read()
 
     log.info("Kobler til Blogger API...")
     creds   = get_credentials()
     service = build("blogger", "v3", credentials=creds)
 
-    log.info(f"Henter eksisterende Blogger-side (PAGE_ID={PAGE_ID})...")
-    try:
-        page = service.pages().get(blogId=BLOG_ID, pageId=PAGE_ID).execute()
-    except Exception as e:
-        log.error(f"Feil ved henting av side: {e}")
-        return
-
-    existing_content = page.get("content", "")
-    page_title       = page.get("title", "New Metal Album Releases")
-
-    if START_MARKER not in existing_content:
-        log.error(f"Finner ikke '{START_MARKER}' på Blogger-siden.")
-        log.error("Legg inn markørene manuelt på siden og kjør igjen.")
-        log.error(f"  Start: {START_MARKER}")
-        log.error(f"  Slutt: {END_MARKER}")
-        return
-
-    try:
-        updated_content = replace_between_markers(existing_content, new_block)
-    except ValueError as e:
-        log.error(str(e))
-        return
-
-    log.info("Oppdaterer Blogger-siden...")
+    log.info(f"Oppdaterer Blogger-siden (PAGE_ID={PAGE_ID})...")
     try:
         service.pages().update(
             blogId=BLOG_ID,
             pageId=PAGE_ID,
-            body={"title": page_title, "content": updated_content}
+            body={"title": "New Metal Album Releases", "content": new_content}
         ).execute()
         log.info("Blogger-siden oppdatert!")
     except Exception as e:
