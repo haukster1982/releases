@@ -51,10 +51,6 @@ def get_credentials():
             creds.refresh(Request())
 
     return creds
-            with open(TOKEN_FILE, "wb") as f:
-                pickle.dump(creds, f)
-
-    return creds
 
 
 def replace_between_markers(existing_content, new_block):
