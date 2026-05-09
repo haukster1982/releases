@@ -39,35 +39,18 @@ END_MARKER   = "<!-- HMT NEW RELEASES END -->"
 
 
 def get_credentials():
-    """Henter Google-credentials fra fil eller miljøvariabel."""
+    """Henter Google-credentials fra token.pickle — samme metode som metal-releases."""
     creds = None
 
-    # GitHub Actions: bruk miljøvariabler
-    token_json = os.environ.get("BLOGGER_TOKEN_JSON")
-    if token_json:
-        token_data = json.loads(token_json)
-        creds = Credentials.from_authorized_user_info(token_data, SCOPES)
-
-    # Lokal: bruk token.pickle
-    elif os.path.exists(TOKEN_FILE):
+    if os.path.exists(TOKEN_FILE):
         with open(TOKEN_FILE, "rb") as f:
             creds = pickle.load(f)
 
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
-        else:
-            # Lokal OAuth-flyt
-            client_secret_json = os.environ.get("BLOGGER_CLIENT_SECRET_JSON")
-            if client_secret_json:
-                with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as tmp:
-                    tmp.write(client_secret_json)
-                    tmp_path = tmp.name
-                flow = InstalledAppFlow.from_client_secrets_file(tmp_path, SCOPES)
-                os.unlink(tmp_path)
-            else:
-                flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRET, SCOPES)
-            creds = flow.run_local_server(port=0)
+
+    return creds
             with open(TOKEN_FILE, "wb") as f:
                 pickle.dump(creds, f)
 
