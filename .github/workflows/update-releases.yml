@@ -1,8 +1,8 @@
-name: Update Heavy Metal Talks Releases
+name: Update Heavy Metal Talks Releases (legacy - manual only)
 
+# Legacy pipeline. Automatic scheduling is disabled because metal-releases
+# is the active publisher for the same Blogger page.
 on:
-  schedule:
-    - cron: "0 6 * * *"
   workflow_dispatch:
 
 jobs:
